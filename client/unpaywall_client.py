@@ -1,12 +1,10 @@
-from urllib.parse import urlparse
-
 import requests
 import logging
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
 class UnpaywallClient:
-
     known_libs = ["wiley.com", "pnas.org", "science.org"]
 
     def __init__(self, email):
@@ -40,7 +38,4 @@ class UnpaywallClient:
 
         start = parsed.path.rfind("abs/") + 4
         return parsed.path[start:]
-
-
-
 

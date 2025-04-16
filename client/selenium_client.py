@@ -1,33 +1,62 @@
+import os
+import time
+import glob
+import shutil
+import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-import time
+
+
+logger = logging.getLogger(__name__)
 
 class SeleniumClient:
 
-    @staticmethod
-    def download_pdf_with_browser(pdf_url, output_path="temp.pdf"):
-        chrome_options = Options()
-        chrome_options.add_argument("--headless=new")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--no-sandbox")
+    def download_pdf(self, pdf_url: str, doi: str) -> str | None:
+        # Use the system Downloads folder
+        downloads_dir = os.path.expanduser("~/Downloads")
+        project_pdfs_dir = os.path.abspath("pdfs")
+        os.makedirs(project_pdfs_dir, exist_ok=True)
 
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-        driver.get(pdf_url)
+        # Configure Chrome options
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
+        options.add_experimental_option("prefs", {
+            "download.default_directory": downloads_dir,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "plugins.always_open_pdf_externally": True
+        })
 
-        # Let Cloudflare pass (sleep = hacky but effective)
-        time.sleep(5)
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=options)
 
-        # If redirected to the real PDF, re-fetch with requests
-        resolved_url = driver.current_url
-        driver.quit()
+        try:
+            logger.info(f"Navigating to {pdf_url}")
+            driver.get(pdf_url)
 
-        if resolved_url.endswith(".pdf"):
-            import requests
-            r = requests.get(resolved_url)
-            with open(output_path, "wb") as f:
-                f.write(r.content)
-            return output_path
-        else:
-            print("No direct PDF found after browser load.")
-            return None
+            # Wait up to 15 seconds for download to appear
+            downloaded_file = None
+            for _ in range(30):  # 30 x 0.5s = 15s max
+                time.sleep(0.5)
+                pdfs = glob.glob(os.path.join(downloads_dir, "*.pdf"))
+                if pdfs:
+                    downloaded_file = max(pdfs, key=os.path.getctime)
+                    break
+
+            if not downloaded_file:
+                logger.error("PDF not downloaded in time.")
+                return None
+
+            # Rename and move to ./pdfs using DOI-based name
+            safe_name = doi.replace("/", "-") + ".pdf"
+            final_path = os.path.join(project_pdfs_dir, safe_name)
+            shutil.move(downloaded_file, final_path)
+            logger.info(f"PDF moved to {final_path}")
+            return final_path
+
+        finally:
+            driver.quit()
+

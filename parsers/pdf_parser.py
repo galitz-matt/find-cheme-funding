@@ -9,10 +9,6 @@ class PDFParser:
 
     def scrape_acknowledgments(self, pdf_url):
         try:
-            res = requests.get(pdf_url, headers=self.headers)
-            print(res.content)
-            with open("temp.pdf", "wb") as f:
-                f.write(res.content)
 
             doc = fitz.open("temp.pdf")
             text = ""

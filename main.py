@@ -1,7 +1,8 @@
+from client.selenium_client import SeleniumClient
 from client.unpaywall_client import UnpaywallClient
-import logging
-
+from services.pdf_downloader import PDFDownloader
 from parsers.pdf_parser import PDFParser
+import logging
 
 logging.basicConfig(level=logging.INFO)
 
@@ -10,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 # name = "Bryan Berger"
 # affiliation = "University of Virginia"
+email = "galitz.matthew@gmail.com"
 #
 # client = ScholarlyClient()
 # author_profile = client.get_author_profile(name, affiliation)
@@ -18,11 +20,5 @@ logging.basicConfig(level=logging.INFO)
 # pub_url = publications[4]["url"]
 
 pub_url = 'https://www.pnas.org/doi/abs/10.1073/pnas.1523633113'
-unpaywall = UnpaywallClient("galitz.matthew@gmail.com")
-pdf_url = unpaywall.get_oa_pdf_url(pub_url)
-print("OA PDF URL:", pdf_url)
-
-pdf_parser = PDFParser()
-print(pdf_parser.scrape_acknowledgments(pdf_url))
-
-
+pdf_downloader = PDFDownloader(UnpaywallClient(email), SeleniumClient())
+pdf_downloader.download_pdf(pub_url)
