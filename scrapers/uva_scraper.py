@@ -1,7 +1,7 @@
 from scrapers.cheme_scraper import ChemEScraper
-from client.http_client import HttpClient
 from lxml import html
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +16,6 @@ class UVAScraper(ChemEScraper):
     ABOUT_XPATH = "//h2[text()='About']/following-sibling::*"
     RESEARCH_INTERESTS_XPATH = "//h2[normalize-space(text())='Research Interests']/following-sibling::div[@class='directory_grid_items']//div[@class='directory_grid_item']"
 
-    def __init__(self, http_client: HttpClient):
-        self.http_client = http_client
 
     def scrape_faculty_profiles(self):
         logger.info("Scraping UVA ChemE faculty profiles.")
@@ -40,7 +38,7 @@ class UVAScraper(ChemEScraper):
         return faculty_data
 
     def get_profile_endpoints(self):
-        response = self.http_client.get(self.PEOPLE_URL)
+        response = requests.get(self.PEOPLE_URL)
         tree = html.fromstring(response.content)
         return tree.xpath(self.CONTACT_BLOCK_NAME_XPATH)
 
@@ -49,7 +47,7 @@ class UVAScraper(ChemEScraper):
         return " ".join(name.capitalize() for name in endpoint.split("-"))
 
     def get_about_from_profile(self, profile_url):
-        response = self.http_client.get(profile_url)
+        response = requests.get(profile_url)
         tree = html.fromstring(response.content)
         raw_education = tree.xpath(self.EDUCATION_XPATH)
         if raw_education:

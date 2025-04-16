@@ -16,7 +16,7 @@ class ScholarlyClient:
         if not profile:
             return []
         publications = []
-        for pub in profile["publications"][:10]:
+        for pub in profile["publications"][:5]:
             filled = scholarly.fill(pub)
 
             pub_url = filled.get("pub_url")
