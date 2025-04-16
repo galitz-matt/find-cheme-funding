@@ -1,26 +1,26 @@
 import fitz
+import logging
 import re
-import requests
+
+logger = logging.getLogger(__name__)
 
 class PDFParser:
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
-    }
-
-    def scrape_acknowledgments(self, pdf_url):
+    @staticmethod
+    def scrape_acknowledgments(file_path):
+        logger.info(f"Parsing acknowledgments for {file_path}")
         try:
-
-            doc = fitz.open("temp.pdf")
-            text = ""
-            for page in doc:
-                text += page.get_text()
-
-            match = re.search(r"(acknowledg(e)?ments?|funding).{0,20}\n(.*?)(\n\n|\Z)", text, re.IGNORECASE | re.DOTALL)
-            if match:
-                return match.group(0).strip()
-            else:
-                return "Acknowledgements not found"
+            doc = fitz.open(file_path)
+            full_text = [page.get_text("blocks") for page in doc]
+            for page_blocks in full_text:
+                for block in page_blocks:
+                    text = block[4]
+                    if re.search(r"acknowledg(e)?ments?", text, re.IGNORECASE):
+                        idx = page_blocks.index(block)
+                        body_blocks = page_blocks[idx + 1: idx + 4]
+                        body = "\n".join(b[4].strip() for b in body_blocks)
+                        return f"{text.strip()}\n{body.strip()}"
+            return "Acknowledgements not found"
         except Exception as e:
-            print(f"Error reading PDF: {e}")
+            logger.exception("Failed to parse acknowledgements")
             return "Error reading PDF"
 

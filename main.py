@@ -21,4 +21,7 @@ email = "galitz.matthew@gmail.com"
 
 pub_url = 'https://www.pnas.org/doi/abs/10.1073/pnas.1523633113'
 pdf_downloader = PDFDownloader(UnpaywallClient(email), SeleniumClient())
-pdf_downloader.download_pdf(pub_url)
+file_path = pdf_downloader.download_pdf(pub_url)
+
+pdf_parser = PDFParser()
+print(pdf_parser.scrape_acknowledgments(file_path))
