@@ -15,13 +15,12 @@ class SeleniumClient:
 
     def download_pdf(self, pdf_url: str, doi: str) -> str | None:
         # Use the system Downloads folder
-        downloads_dir = os.path.expanduser("~/Downloads")
+        downloads_dir = os.path.abspath("downloads")
         project_pdfs_dir = os.path.abspath("pdfs")
-        os.makedirs(project_pdfs_dir, exist_ok=True)
 
         # Configure Chrome options
         options = Options()
-        options.add_argument("--headless")
+        #options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_experimental_option("prefs", {
             "download.default_directory": downloads_dir,
