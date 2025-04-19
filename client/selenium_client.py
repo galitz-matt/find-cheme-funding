@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class SeleniumClient:
     @staticmethod
-    def download_pdf(self, pdf_url: str, doi: str) -> str | None:
+    def download_pdf(pdf_url: str, doi: str) -> str | None:
         # Use the system Downloads folder
         downloads_dir = os.path.abspath("downloads")
 

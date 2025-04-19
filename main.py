@@ -15,6 +15,7 @@ name = "Bryan Berger"
 affiliation = "University of Virginia"
 email = "galitz.matthew@gmail.com"
 
+# GET PUBLICATIONS
 client = ScholarlyClient()
 author_profile = client.get_author_profile(name, affiliation)
 publications = client.get_publications(author_profile)
