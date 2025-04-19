@@ -16,7 +16,6 @@ class SeleniumClient:
     def download_pdf(self, pdf_url: str, doi: str) -> str | None:
         # Use the system Downloads folder
         downloads_dir = os.path.abspath("downloads")
-        project_pdfs_dir = os.path.abspath("pdfs")
 
         # Configure Chrome options
         options = Options()
@@ -51,9 +50,9 @@ class SeleniumClient:
 
             # Rename and move to ./pdfs using DOI-based name
             safe_name = doi.replace("/", "-") + ".pdf"
-            final_path = os.path.join(project_pdfs_dir, safe_name)
+            final_path = os.path.join(downloads_dir, safe_name)
             shutil.move(downloaded_file, final_path)
-            logger.info(f"PDF moved to {final_path}")
+            logger.info(f"PDF renamed to {final_path}")
             return final_path
 
         finally:
