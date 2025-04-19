@@ -12,7 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 logger = logging.getLogger(__name__)
 
 class SeleniumClient:
-
+    @staticmethod
     def download_pdf(self, pdf_url: str, doi: str) -> str | None:
         # Use the system Downloads folder
         downloads_dir = os.path.abspath("downloads")
