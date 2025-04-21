@@ -20,7 +20,7 @@ class PDFDownloader:
         logger.info(f"Downloading {pdf_url}")
         res = requests.get(pdf_url, headers=self.headers)
 
-        destination = os.path.join(os.getcwd(), "pdfs")
+        destination = os.path.join(os.getcwd(), "downloads")
         os.makedirs(destination, exist_ok=True)
 
         if "application/pdf" not in res.headers.get("Content-Type", ""):
