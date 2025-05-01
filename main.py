@@ -4,10 +4,11 @@ from client.scholarly_client import ScholarlyClient
 from services.pdf_downloader import PDFDownloader
 from parsers.pdf_parser import PDFParser
 from parsers.acknowledgments_parser import AcknowledgmentsParser
+from pprint import pprint
 from scrapers.uva_scraper import UVAScraper
 import logging
-#
-# logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO)
 
 # scraper = UVAScraper()
 # profiles = scraper.scrape_faculty_profiles()
@@ -20,18 +21,19 @@ client = ScholarlyClient()
 author_profile = client.get_author_profile(name, affiliation)
 publications = client.get_publications(author_profile)
 
-pub_url = publications[4]["url"]
-print(pub_url)
+pprint(publications)
 
-pdf_downloader = PDFDownloader(UnpaywallClient(email), SeleniumClient())
-file_path = pdf_downloader.download_pdf(pub_url)
-
-pdf_parser = PDFParser()
-ack = pdf_parser.scrape_acknowledgments(file_path)
-print(ack)
-
-ack_parser = AcknowledgmentsParser()
-
-funding = ack_parser.extract_funding(ack)
-from pprint import pprint
-pprint(funding)
+# pub_url = publications[0]["url"]
+# print(pub_url)
+#
+# pdf_downloader = PDFDownloader(UnpaywallClient(email), SeleniumClient())
+# file_path = pdf_downloader.download_pdf(pub_url)
+#
+# pdf_parser = PDFParser()
+# ack = pdf_parser.scrape_acknowledgments(file_path)
+# print(ack)
+#
+# ack_parser = AcknowledgmentsParser()
+#
+# funding = ack_parser.extract_funding(ack)
+# pprint(funding)
